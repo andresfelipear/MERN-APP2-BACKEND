@@ -11,6 +11,7 @@ router.post('/signup', userController.postSignUp)
 //refresh Token
 router.post('/refreshToken', userController.postRefreshToken)
 
-
+//verify user logged
+router.get('/me',verifyUser, userController.getData)
 module.exports = router
     

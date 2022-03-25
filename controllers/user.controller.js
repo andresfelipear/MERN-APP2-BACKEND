@@ -40,3 +40,56 @@ exports.postSignUp = async (req, res, next) => {
     res.status(400).json({ error });
   }
 }
+
+//refreshToken
+exports.postRefreshToken = (req, res, next) => {
+  const { signedCookies = {} } = req
+  const { refreshToken } = signedCookies
+  if (refreshToken) {
+    try {
+      const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+      const userId = payload._id
+      User.findOne({ _id: userId }).then(user => {
+        if (user) {
+          const tokenIndex = user.refreshToken.findIndex(item => item.refreshToken == refreshToken)
+
+          if (tokenIndex === -1) {
+            res.status(401).send("Unauthorized")
+          } else {
+            const token = getToken({ _id: userId })
+            const newRefreshToken = getRefreshToken({ _id: userId })
+            user.refreshToken[tokenIndex] = { refreshToken: newRefreshToken }
+            user.save((err, user) => {
+              if (err) {
+                res.status(500).send(err)
+              } else {
+                res.cookie("refreshToken", newRefreshToken, COOKIE_OPTIONS)
+                res.send({ success: true, token })
+              }
+            })
+          }
+        }
+      })
+    } catch (err) {
+      console.log(err)
+      res.status(401).send("Unauthorized")
+    }
+  } else {
+    (err) => {
+      console.log(err)
+    }
+    res.status(401).send("Unauthorized")
+  }
+}
+
+//getData user logged
+exports.getData = (req, res, next) => {
+  try {
+    res.send(req.user)
+
+  } catch (error) {
+    console.log(err)
+    res.status(401).json({ error })
+  }
+
+}
