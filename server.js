@@ -37,7 +37,7 @@ app.get("/", (req, res) => {
     res.send("this is the test route to make sure server is working")
 })
 app.use("/api/user", userRoute) 
-app.use("/api/admin", adminRoute) 
+// app.use("/api/admin", adminRoute) 
 
 const {PORT = 8000} = process.env
 app.listen(PORT, () => log.green("SERVER STATUS", `Listening on port ${PORT}`))
