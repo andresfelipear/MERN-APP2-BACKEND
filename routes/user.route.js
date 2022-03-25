@@ -20,6 +20,9 @@ router.get('/logout',verifyUser, userController.getLogout)
 //Post Login
 router.post('/login',  passport.authenticate("local"),userController.postLogin)
 
+//Post reset Password Link
+router.post('/forgot',userController.postForgot)
+
 
 
 

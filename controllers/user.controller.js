@@ -152,3 +152,41 @@ exports.postLogin = (req, res, next) => {
     res.status(400).json({ error });
   }
 }
+
+exports.postForgot = (req, res, next) => {
+  const bcryptSalt = 10;
+  try {
+    const { username } = req.body
+    User.findOne({ username: username }, async (err, user) => {
+      if (user) {
+        const token = await Token.findOne({ userId: user._id })
+        if (token) await token.deleteOne()
+        const resetToken = crypto.randomBytes(32).toString("hex")
+        try {
+          const hash = await bcrypt.hash(resetToken, bcryptSalt)
+          await new Token({
+            userId: user._id,
+            token: hash,
+            createdAt: Date.now()
+          }).save()
+          const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`
+          sendEmail
+            (
+              user.email,
+              "Password Reset Request",
+              { username: user.username, link, title:"Breakfasts App"},
+              "./template/requestResetPassword.handlebars"
+            )
+          res.send({ sucess: true })
+        } catch (error) {
+          res.status(400).json({ error });
+        }
+      }
+      else {
+        res.status(400).json({ err });
+      }
+    })
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+}
