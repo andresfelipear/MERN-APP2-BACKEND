@@ -4,7 +4,7 @@ const morgan = require("morgan")
 const {log} = require("mercedlogger") 
 const cors = require("cors") 
 const userRoute = require("./routes/user.route") 
-const adminRoute = require("./routes/admin.route")
+// const adminRoute = require("./routes/admin.route")
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 
