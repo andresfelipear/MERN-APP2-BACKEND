@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken')
 const sendEmail = require('../utils/email/sendEmail')
 
+const User = require("../models/user.model")
 
 const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authenticate')
 
 
 exports.postSignUp = async (req, res, next) => {
-  const { User } = req.context.models;
   try {
     User.register(new User({ username: req.body.username }),
       req.body.password,
@@ -26,8 +26,8 @@ exports.postSignUp = async (req, res, next) => {
               res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
               const email = sendEmail(
                 user.email,
-                "Welcome Travel Blog",
-                { username: user.username, email: user.email },
+                "Welcome Breakfasts App",
+                { username: user.username, email: user.email, title:"Breakfasts App" },
                 "./template/welcomeUser.handlebars"
               )
               res.send({ sucess: true, token })
