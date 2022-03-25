@@ -13,5 +13,15 @@ router.post('/refreshToken', userController.postRefreshToken)
 
 //verify user logged
 router.get('/me',verifyUser, userController.getData)
+
+//logout user
+router.get('/logout',verifyUser, userController.getLogout)
+
+//Post Login
+router.post('/login',  passport.authenticate("local"),userController.postLogin)
+
+
+
+
 module.exports = router
     

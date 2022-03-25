@@ -93,3 +93,62 @@ exports.getData = (req, res, next) => {
   }
 
 }
+
+//logout user
+exports.getLogout = (req, res, next) => {
+  try {
+
+    const { signedCookies = {} } = req
+    const { refreshToken } = signedCookies;
+
+    User.findById(req.user._id)
+      .then((user) => {
+        const tokenIndex = user.refreshToken.findIndex(item => item.refreshToken == refreshToken)
+        if (tokenIndex !== -1) {
+          user.refreshToken.id(user.refreshToken[tokenIndex]._id).remove()
+        }
+        user.save((err, user) => {
+          if (err) {
+            res.status(500).send(err)
+          } else {
+            res.clearCookie('refreshToken', COOKIE_OPTIONS)
+            res.send({ success: true })
+          }
+
+        })
+      })
+  }
+  catch (error) {
+    console.log(error);
+    res.status(401).json({ error })
+  }
+
+}
+
+exports.postLogin = (req, res, next) => {
+  try {
+    const token = getToken({ _id: req.user._id })
+    const refreshToken = getRefreshToken({ _id: req.user._id })
+
+    const { username, password } = req.body
+    User.findOne({ username: username }, (err, user) => {
+      if (user) {
+        user.refreshToken.push({ refreshToken })
+        user.save((err, user) => {
+          if (err) {
+            res.status(500).send(err)
+          } else {
+            res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
+            res.send({ success: true, token })
+          }
+        })
+      }
+      else {
+        res.status(400).json({ err });
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ error });
+  }
+}
