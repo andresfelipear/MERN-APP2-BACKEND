@@ -198,3 +198,42 @@ exports.postForgot = (req, res, next) => {
     res.status(400).json({ error });
   }
 }
+
+//post resetPassword 
+exports.postResetPassword = async (req, res, next) => {
+  const { password, userId, token } = req.body;
+  Token.findOne({ userId: userId }, async (error, resetToken) => {
+    if (resetToken) {
+      const isValid = await bcrypt.compare(token, resetToken.token)
+      if (!isValid) {
+        res.status(400).json({ err });
+      } else {
+        User.findOne({ _id:userId }, async (err, user) => {
+          if (user) {
+            await user.setPassword(password);
+            await user.save()
+            sendEmail
+              (
+                user.email,
+                "Password Reset Successfully",
+                { username: user.username, title:"Breakfasts App" },
+                "./template/resetPassword.handlebars"
+              )
+            res.send({ sucess: true })
+
+          } else {
+            res.status(400).json({ err });
+          }
+
+        })
+
+
+      }
+    } else {
+      res.status(400).json({ error });
+    }
+  })
+
+
+
+}

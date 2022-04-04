@@ -23,6 +23,9 @@ router.post('/login',  passport.authenticate("local"),userController.postLogin)
 //Post reset Password Link
 router.post('/forgot',userController.postForgot)
 
+//Post reset password form
+router.post('/resetPassword', userController.postResetPassword)
+
 
 
 
