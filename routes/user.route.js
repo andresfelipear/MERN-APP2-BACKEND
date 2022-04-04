@@ -26,6 +26,9 @@ router.post('/forgot',userController.postForgot)
 //Post reset password form
 router.post('/resetPassword', userController.postResetPassword)
 
+//Post contact form
+router.post('/contact', userController.postContact)
+
 
 
 

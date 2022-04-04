@@ -32,7 +32,7 @@ exports.postSignUp = async (req, res, next) => {
               const email = sendEmail(
                 user.email,
                 "Welcome Breakfasts App",
-                { username: user.username, email: user.email, title:"Breakfasts App" },
+                { username: user.username, email: user.email, title: "Breakfasts App" },
                 "./template/welcomeUser.handlebars"
               )
               res.send({ sucess: true, token })
@@ -165,7 +165,7 @@ exports.postForgot = (req, res, next) => {
   const bcryptSalt = 10;
   try {
     const { username } = req.body
-    User.findOne({$or:[{username:username}, {email:username}]}, async (err, user) => {
+    User.findOne({ $or: [{ username: username }, { email: username }] }, async (err, user) => {
       if (user) {
         const token = await Token.findOne({ userId: user._id })
         if (token) await token.deleteOne()
@@ -182,7 +182,7 @@ exports.postForgot = (req, res, next) => {
             (
               user.email,
               "Password Reset Request",
-              { username: user.username, link, title:"Breakfasts App"},
+              { username: user.username, link, title: "Breakfasts App" },
               "./template/requestResetPassword.handlebars"
             )
           res.send({ sucess: true })
@@ -208,7 +208,7 @@ exports.postResetPassword = async (req, res, next) => {
       if (!isValid) {
         res.status(400).json({ err });
       } else {
-        User.findOne({ _id:userId }, async (err, user) => {
+        User.findOne({ _id: userId }, async (err, user) => {
           if (user) {
             await user.setPassword(password);
             await user.save()
@@ -216,7 +216,7 @@ exports.postResetPassword = async (req, res, next) => {
               (
                 user.email,
                 "Password Reset Successfully",
-                { username: user.username, title:"Breakfasts App" },
+                { username: user.username, title: "Breakfasts App" },
                 "./template/resetPassword.handlebars"
               )
             res.send({ sucess: true })
@@ -233,7 +233,19 @@ exports.postResetPassword = async (req, res, next) => {
       res.status(400).json({ error });
     }
   })
+}
 
+//Post contact
+exports.postContact = async (req, res, next) => {
+  const { name, phone, email, message } = req.body;
 
+  //confirmation mail user
+  sendEmail
+    (
+      email,
+      "Password Reset Successfully",
+      { name:name, title: "Breakfasts App"},
+      "./template/contactFormConfirm.handlebars"
+    )
 
 }
