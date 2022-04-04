@@ -2,9 +2,14 @@ const jwt = require('jsonwebtoken')
 const sendEmail = require('../utils/email/sendEmail')
 
 const User = require("../models/user.model")
+const Token = require("../models/token.models")
 
 const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authenticate')
 
+const bcrypt = require('bcrypt')
+const crypto = require('crypto')
+const { log } = require('console')
+const clientURL = process.env.CLIENT_URL
 
 exports.postSignUp = async (req, res, next) => {
   try {
@@ -125,6 +130,7 @@ exports.getLogout = (req, res, next) => {
 
 }
 
+//login
 exports.postLogin = (req, res, next) => {
   try {
     const token = getToken({ _id: req.user._id })
@@ -153,11 +159,13 @@ exports.postLogin = (req, res, next) => {
   }
 }
 
+
+//forgot link
 exports.postForgot = (req, res, next) => {
   const bcryptSalt = 10;
   try {
     const { username } = req.body
-    User.findOne({ username: username }, async (err, user) => {
+    User.findOne({$or:[{username:username}, {email:username}]}, async (err, user) => {
       if (user) {
         const token = await Token.findOne({ userId: user._id })
         if (token) await token.deleteOne()
@@ -169,7 +177,7 @@ exports.postForgot = (req, res, next) => {
             token: hash,
             createdAt: Date.now()
           }).save()
-          const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`
+          const link = `${clientURL}/resetPassword?token=${resetToken}&id=${user._id}`
           sendEmail
             (
               user.email,
