@@ -11,6 +11,9 @@ const crypto = require('crypto')
 const { log } = require('console')
 const clientURL = process.env.CLIENT_URL
 
+//date time format
+const date = require('date-and-time')
+
 exports.postSignUp = async (req, res, next) => {
   try {
     User.register(new User({ username: req.body.username }),
@@ -238,14 +241,34 @@ exports.postResetPassword = async (req, res, next) => {
 //Post contact
 exports.postContact = async (req, res, next) => {
   const { name, phone, email, message } = req.body;
+  const emailCustomerService = process.env.CUSTOMER_SERVICE_EMAIL
+  const now = new Date()
+  const dateFormat = date.format(now, "YYYY/MM/DD HH:mm:ss")
 
-  //confirmation mail user
-  sendEmail
-    (
-      email,
-      "Password Reset Successfully",
-      { name:name, title: "Breakfasts App"},
-      "./template/contactFormConfirm.handlebars"
-    )
+  try {
+    //confirmation mail user
+    sendEmail
+      (
+        email,
+        "Contact form",
+        { name: name, title: "Breakfasts App" },
+        "./template/contactFormConfirm.handlebars"
+      )
+
+    //details contact form
+    sendEmail
+      (
+        emailCustomerService,
+        "Details Contact Form",
+        { date: dateFormat, name: name, phone: phone, email: email, message: message, title: "Breakfasts App" },
+        "./template/contactFormDetails.handlebars"
+      )
+    res.status(200).send({ sucess: true })
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ err })
+  }
+
 
 }
