@@ -4,7 +4,7 @@ const morgan = require("morgan")
 const {log} = require("mercedlogger") 
 const cors = require("cors") 
 const userRoute = require("./routes/user.route") 
-// const adminRoute = require("./routes/admin.route")
+const adminRoute = require("./routes/admin.route")
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 
@@ -37,7 +37,7 @@ app.get("/", (req, res) => {
     res.send("this is the test route to make sure server is working")
 })
 app.use("/api/user", userRoute) 
-// app.use("/api/admin", adminRoute) 
+app.use("/api/admin", adminRoute) 
 
 const {PORT = 8000} = process.env
 app.listen(PORT, () => log.green("SERVER STATUS", `Listening on port ${PORT}`))
