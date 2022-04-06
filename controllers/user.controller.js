@@ -188,7 +188,7 @@ exports.postForgot = (req, res, next) => {
               { username: user.username, link, title: "Breakfasts App" },
               "./template/requestResetPassword.handlebars"
             )
-          res.send({ sucess: true })
+          res.send({ success: true })
         } catch (error) {
           res.status(400).json({ error });
         }
@@ -222,7 +222,7 @@ exports.postResetPassword = async (req, res, next) => {
                 { username: user.username, title: "Breakfasts App" },
                 "./template/resetPassword.handlebars"
               )
-            res.send({ sucess: true })
+            res.send({ success: true })
 
           } else {
             res.status(400).json({ err });
@@ -263,7 +263,7 @@ exports.postContact = async (req, res, next) => {
         { date: dateFormat, name: name, phone: phone, email: email, message: message, title: "Breakfasts App" },
         "./template/contactFormDetails.handlebars"
       )
-    res.status(200).send({ sucess: true })
+    res.status(200).send({ success: true })
 
   } catch (err) {
     console.log(err);
