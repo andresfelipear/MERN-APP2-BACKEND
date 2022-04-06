@@ -18,7 +18,11 @@ const breakfastsSchema = new Schema({
         item:{
             type: String
         }
-    }]
+    }],
+    likes:{
+        type: Number,
+        default:0
+    },
 })
 
-module.exports = mongoose.model('Token', tokenSchema)
+module.exports = mongoose.model('Breakfasts', breakfastsSchema)

@@ -3,6 +3,7 @@ const sendEmail = require('../utils/email/sendEmail')
 
 const User = require("../models/user.model")
 const Token = require("../models/token.models")
+const Breakfasts = require("../models/breakfasts.models")
 
 const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authenticate')
 
@@ -269,6 +270,22 @@ exports.postContact = async (req, res, next) => {
     console.log(err);
     res.status(500).json({ err })
   }
+}
 
+//get Posts
+exports.getBreakfasts = (req, res, next) => {
+  try {
+    Breakfasts.find((err, breakfasts) => {
+      if (err) {
+        res.status(400).json({ err });
+      } else {
+        res.send({ success: true, breakfasts })
+      }
+    })
+
+  } catch (error) {
+    console.log(error);
+    res.status(401).json({ error })
+  }
 
 }

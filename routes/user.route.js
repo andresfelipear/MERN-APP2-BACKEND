@@ -29,8 +29,8 @@ router.post('/resetPassword', userController.postResetPassword)
 //Post contact form
 router.post('/contact', userController.postContact)
 
-
-
+//getBreakfasts
+router.get('/getBreakfasts', userController.getBreakfasts)
 
 module.exports = router
     
