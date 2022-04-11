@@ -32,5 +32,8 @@ router.post('/contact', userController.postContact)
 //getBreakfasts
 router.get('/getBreakfasts', userController.getBreakfasts)
 
+//getBreakfast
+router.get('/getBreakfast/:breakfastId', userController.getBreakfast)
+
 module.exports = router
     

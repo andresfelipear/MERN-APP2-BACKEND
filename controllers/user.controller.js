@@ -272,7 +272,7 @@ exports.postContact = async (req, res, next) => {
   }
 }
 
-//get Posts
+//get Breakfasts(all)
 exports.getBreakfasts = (req, res, next) => {
   try {
     Breakfasts.find((err, breakfasts) => {
@@ -280,6 +280,25 @@ exports.getBreakfasts = (req, res, next) => {
         res.status(400).json({ err });
       } else {
         res.send({ success: true, breakfasts })
+      }
+    })
+
+  } catch (error) {
+    console.log(error);
+    res.status(401).json({ error })
+  }
+
+}
+
+//get Breakfast (One)
+exports.getBreakfast = (req, res, next) => {
+  try {
+    const {breakfastId} = req.params
+    Breakfasts.findById(breakfastId, (err, breakfast) => {
+      if (err) {
+        res.status(400).json({ err });
+      } else {
+        res.send({ success: true, breakfast })
       }
     })
 
