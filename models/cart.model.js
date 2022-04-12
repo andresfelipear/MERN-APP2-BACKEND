@@ -21,7 +21,7 @@ const cartSchema = new Schema({
     }],
     totalPrice:{
         type: Number,
-        default:function(){
+        default:  function(){
             let total=0;
             for(let i=0;i<this.products.length;i++){
                 total+= this.products[i].price
