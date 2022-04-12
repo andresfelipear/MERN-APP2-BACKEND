@@ -4,7 +4,7 @@ const sendEmail = require('../utils/email/sendEmail')
 const User = require("../models/user.model")
 const Token = require("../models/token.models")
 const Breakfasts = require("../models/breakfasts.models")
-
+const Cart = require("../models/cart.model")
 const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authenticate')
 
 const bcrypt = require('bcrypt')
@@ -14,6 +14,15 @@ const clientURL = process.env.CLIENT_URL
 
 //date time format
 const date = require('date-and-time')
+const { copyFileSync } = require('fs')
+
+const getById = (cartId) => {
+  return Cart.findById(cartId, (err, cart) => {
+    if (err) console.log(err)
+    return cart
+  }).clone()
+}
+
 
 exports.postSignUp = async (req, res, next) => {
   try {
@@ -293,7 +302,7 @@ exports.getBreakfasts = (req, res, next) => {
 //get Breakfast (One)
 exports.getBreakfast = (req, res, next) => {
   try {
-    const {breakfastId} = req.params
+    const { breakfastId } = req.params
     Breakfasts.findById(breakfastId, (err, breakfast) => {
       if (err) {
         res.status(400).json({ err });
@@ -307,4 +316,74 @@ exports.getBreakfast = (req, res, next) => {
     res.status(401).json({ error })
   }
 
+}
+
+
+//add item cart
+exports.postAddItem = (req, res, next) => {
+  try {
+    const { quantity, breakfast } = req.body
+    const breakfastId = breakfast._id;
+
+    Cart.find((err, carts) => {
+      if (carts.length !== 0) {
+        const cart = carts[0]
+        const products = cart.products;
+        const matchProduct = products.find(element => element.product.toString() === breakfastId);
+        if (matchProduct) {
+          matchProduct.quantity = parseInt(quantity) + parseInt(matchProduct.quantity);
+          matchProduct.price = breakfast.Price * matchProduct.quantity
+        } else {
+          cart.products = [...cart.products,
+          {
+            product: breakfast._id,
+            quantity: quantity,
+            price: breakfast.Price * quantity
+          }]
+        }
+
+        //calc total price
+        const totalPrice = () => {
+          let total = 0;
+          for (let i = 0; i < cart.products.length; i++) {
+            total += cart.products[i].price
+          }
+          return total
+        }
+
+        cart.totalPrice = totalPrice()
+
+        cart.save((err, cart) => {
+          if (err) {
+            console.log(err)
+            res.status(500).send(err)
+          } else {
+            res.send({ sucess: true, cartId: cart._id })
+          }
+        })
+      } else {
+        const cart = new Cart({
+          products: [{
+            product: breakfast._id,
+            quantity: quantity,
+            price: breakfast.Price * quantity
+          }]
+        })
+        cart.save((err, cart) => {
+          if (err) {
+            console.log(err)
+            res.status(500).send(err)
+          } else {
+            console.log(cart)
+            res.send({ sucess: true, cartId: cart._id })
+          }
+        })
+      }
+    })
+
+
+  } catch (err) {
+    console.log(err);
+    res.status(401).json({ err })
+  }
 }
