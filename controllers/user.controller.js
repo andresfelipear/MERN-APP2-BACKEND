@@ -387,3 +387,23 @@ exports.postAddItem = (req, res, next) => {
     res.status(401).json({ err })
   }
 }
+
+//get cart with breakfasts
+exports.getCart = (req,res,next)=>{
+  try{
+    Cart.findOne().populate('products.product').exec((err, cart)=>{
+      if(err){
+        console.log(err)
+        res.status(500).send(err)
+      }
+      else{
+        console.log(cart)
+        res.send({success:true, cart})
+      }
+    })
+
+  }catch(err){
+    console.log(err)
+    res.status(401).json({err})
+  }
+}

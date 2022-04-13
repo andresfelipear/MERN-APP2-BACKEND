@@ -38,5 +38,8 @@ router.get('/getBreakfast/:breakfastId', userController.getBreakfast)
 //add item cart
 router.post('/addItem', userController.postAddItem)
 
+//get cart
+router.get('/getCart', userController.getCart)
+
 module.exports = router
     
