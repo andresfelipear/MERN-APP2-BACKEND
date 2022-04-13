@@ -341,6 +341,8 @@ exports.postAddItem = (req, res, next) => {
             price: breakfast.Price * quantity
           }]
         }
+         
+        
 
         //calc total price
         const totalPrice = () => {
@@ -358,7 +360,18 @@ exports.postAddItem = (req, res, next) => {
             console.log(err)
             res.status(500).send(err)
           } else {
-            res.send({ sucess: true, cartId: cart._id })
+            //removing products with quantity=0
+            cart.products = cart.products.filter(product => product.quantity !== 0);
+            cart.save((err,cart)=>{
+              if (err) {
+                console.log(err)
+                res.status(500).send(err)
+              } else {
+                console.log(cart)
+                res.send({ sucess: true, cartId: cart._id })
+              }
+            })
+            
           }
         })
       } else {
@@ -374,7 +387,6 @@ exports.postAddItem = (req, res, next) => {
             console.log(err)
             res.status(500).send(err)
           } else {
-            console.log(cart)
             res.send({ sucess: true, cartId: cart._id })
           }
         })
@@ -397,7 +409,6 @@ exports.getCart = (req,res,next)=>{
         res.status(500).send(err)
       }
       else{
-        console.log(cart)
         res.send({success:true, cart})
       }
     })
