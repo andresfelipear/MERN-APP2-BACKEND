@@ -322,10 +322,10 @@ exports.getBreakfast = (req, res, next) => {
 //add item cart
 exports.postAddItem = (req, res, next) => {
   try {
-    const { quantity, breakfast } = req.body
+    const { quantity, breakfast, userId } = req.body
     const breakfastId = breakfast._id;
 
-    Cart.find((err, carts) => {
+    Cart.find({ user: userId }, (err, carts) => {
       if (carts.length !== 0) {
         const cart = carts[0]
         const products = cart.products;
@@ -341,7 +341,7 @@ exports.postAddItem = (req, res, next) => {
             price: breakfast.Price * quantity
           }]
         }
-         
+
         //calc total price
         const totalPrice = () => {
           let total = 0;
@@ -360,33 +360,52 @@ exports.postAddItem = (req, res, next) => {
           } else {
             //removing products with quantity=0
             cart.products = cart.products.filter(product => product.quantity !== 0);
-            cart.save((err,cart)=>{
+            cart.save((err, cart) => {
               if (err) {
                 console.log(err)
                 res.status(500).send(err)
               } else {
-                res.send({ sucess: true, cartId: cart._id })
+                res.send({ success: true, cartId: cart._id })
               }
             })
-            
+
           }
         })
       } else {
-        const cart = new Cart({
-          products: [{
-            product: breakfast._id,
-            quantity: quantity,
-            price: breakfast.Price * quantity
-          }]
-        })
-        cart.save((err, cart) => {
-          if (err) {
-            console.log(err)
-            res.status(500).send(err)
-          } else {
-            res.send({ sucess: true, cartId: cart._id })
-          }
-        })
+        if (userId) {
+          const cart = new Cart({
+            products: [{
+              product: breakfast._id,
+              quantity: quantity,
+              price: breakfast.Price * quantity,
+              user: userId
+            }]
+          })
+          cart.save((err, cart) => {
+            if (err) {
+              console.log(err)
+              res.status(500).send(err)
+            } else {
+              res.send({ success: true, cartId: cart._id })
+            }
+          })
+        } else {
+          const cart = new Cart({
+            products: [{
+              product: breakfast._id,
+              quantity: quantity,
+              price: breakfast.Price * quantity,
+            }]
+          })
+          cart.save((err, cart) => {
+            if (err) {
+              console.log(err)
+              res.status(500).send(err)
+            } else {
+              res.send({ success: true, cartId: cart._id })
+            }
+          })
+        }
       }
     })
 
@@ -398,20 +417,20 @@ exports.postAddItem = (req, res, next) => {
 }
 
 //get cart with breakfasts
-exports.getCart = (req,res,next)=>{
-  try{
-    Cart.findOne().populate('products.product').exec((err, cart)=>{
-      if(err){
+exports.getCart = (req, res, next) => {
+  try {
+    Cart.findOne().populate('products.product').exec((err, cart) => {
+      if (err) {
         console.log(err)
         res.status(500).send(err)
       }
-      else{
-        res.send({success:true, cart})
+      else {
+        res.send({ success: true, cart })
       }
     })
 
-  }catch(err){
+  } catch (err) {
     console.log(err)
-    res.status(401).json({err})
+    res.status(401).json({ err })
   }
 }
