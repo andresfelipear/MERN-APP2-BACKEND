@@ -342,8 +342,6 @@ exports.postAddItem = (req, res, next) => {
           }]
         }
          
-        
-
         //calc total price
         const totalPrice = () => {
           let total = 0;
@@ -367,7 +365,6 @@ exports.postAddItem = (req, res, next) => {
                 console.log(err)
                 res.status(500).send(err)
               } else {
-                console.log(cart)
                 res.send({ sucess: true, cartId: cart._id })
               }
             })
