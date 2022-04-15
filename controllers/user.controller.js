@@ -305,7 +305,7 @@ exports.getBreakfast = (req, res, next) => {
     const { breakfastId } = req.params
     Breakfasts.findById(breakfastId, (err, breakfast) => {
       if (err) {
-        res.status(400).json({ err });
+        res.status(500).json({ err });
       } else {
         res.send({ success: true, breakfast })
       }
@@ -313,7 +313,7 @@ exports.getBreakfast = (req, res, next) => {
 
   } catch (error) {
     console.log(error);
-    res.status(401).json({ error })
+    res.status(400).json({ error })
   }
 
 }
@@ -322,11 +322,13 @@ exports.getBreakfast = (req, res, next) => {
 //add item cart
 exports.postAddItem = (req, res, next) => {
   try {
-    const { quantity, breakfast, userId } = req.body
+    const { quantity, breakfast, userId, cartId } = req.body
     const breakfastId = breakfast._id;
 
-    Cart.find({ user: userId }, (err, carts) => {
+    Cart.find({ $or: [{ user: userId }, { _id: cartId }] }, (err, carts) => {
+      console.log(userId + " " + cartId);
       if (carts.length !== 0) {
+        
         const cart = carts[0]
         const products = cart.products;
         const matchProduct = products.find(element => element.product.toString() === breakfastId);
@@ -350,11 +352,17 @@ exports.postAddItem = (req, res, next) => {
           }
           return total
         }
-
+        
         cart.totalPrice = totalPrice()
+
+        //setting user to the cartShop
+        if(cart.length==1 && cartId && userId ){
+          cart.user = userId;
+        }
 
         cart.save((err, cart) => {
           if (err) {
+            console.log("hola");
             console.log(err)
             res.status(500).send(err)
           } else {
@@ -362,6 +370,7 @@ exports.postAddItem = (req, res, next) => {
             cart.products = cart.products.filter(product => product.quantity !== 0);
             cart.save((err, cart) => {
               if (err) {
+                console.log("hola2");
                 console.log(err)
                 res.status(500).send(err)
               } else {
@@ -378,11 +387,12 @@ exports.postAddItem = (req, res, next) => {
               product: breakfast._id,
               quantity: quantity,
               price: breakfast.Price * quantity,
-              user: userId
-            }]
+            }],
+            user: userId
           })
           cart.save((err, cart) => {
             if (err) {
+              console.log("hola3");
               console.log(err)
               res.status(500).send(err)
             } else {
@@ -419,7 +429,9 @@ exports.postAddItem = (req, res, next) => {
 //get cart with breakfasts
 exports.getCart = (req, res, next) => {
   try {
-    Cart.findOne().populate('products.product').exec((err, cart) => {
+    const userId = req.params.userId==="undefined"?undefined:req.params.userId;
+    
+    Cart.findOne({user:userId}).populate('products.product').exec((err, cart) => {
       if (err) {
         console.log(err)
         res.status(500).send(err)
