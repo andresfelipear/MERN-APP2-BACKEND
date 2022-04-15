@@ -10,6 +10,7 @@ const cartSchema = new Schema({
         product: { 
             type: Schema.Types.ObjectId,
             ref: 'Breakfasts',
+            unique:false
         },
         quantity:{
             type: Number,

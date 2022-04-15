@@ -433,12 +433,18 @@ exports.getCart = (req, res, next) => {
 
     console.log(userId + " " + cartId)
     if (userId || cartId) {
-      Cart.findOne({ $or: [{ user: userId }, { _id: cartId }] }).populate('products.product').exec((err, cart) => {
+      Cart.find({ $or: [{ user: userId }, { _id: cartId }, { user: { $exists: 0 } }] }).populate('products.product').exec((err, carts) => {
         if (err) {
           console.log(err)
           res.status(500).send(err)
         }
         else {
+          const cart = carts[0]
+          if (carts.length === 2) {
+            const cart2 = carts[1]
+            joinDuplicates(cart, cart2)
+            cart2.remove()
+          }
           if (cart && cartId && userId && (cart.user === undefined)) {
             cart.user = userId;
           }
@@ -458,8 +464,8 @@ exports.getCart = (req, res, next) => {
           console.log(err)
           res.status(500).send(err)
         } else {
-          if (cart.length!==0) {
-            res.send({ success: true, cart:cart[0] })
+          if (cart.length !== 0) {
+            res.send({ success: true, cart: cart[0] })
           } else {
             const cart = new Cart()
             cart.save((err, cart) => {
@@ -481,4 +487,25 @@ exports.getCart = (req, res, next) => {
     console.log(err)
     res.status(401).json({ err })
   }
+}
+
+
+const joinDuplicates = (cart1, cart2) => {
+  const products1 = cart1.products;
+  const products2 = cart2.products
+
+  products2.forEach(product2 => {
+    const matchProduct = products1.find(product1 => product1.product === product2.product)
+    if (matchProduct) {
+      matchProduct.quantity = parseInt(matchProduct.quantity) + parseInt(product2.quantity)
+      matchProduct.price = matchProduct.price + product2.price
+    } else {
+      cart1.products = [...products1,
+        product2]
+    }
+  });
+
+  cart1.totalPrice = cart1.totalPrice + cart2.totalPrice;
+
+  return cart1
 }
