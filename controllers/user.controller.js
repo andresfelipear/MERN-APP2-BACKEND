@@ -327,7 +327,7 @@ exports.postAddItem = (req, res, next) => {
 
     Cart.find({ $or: [{ user: userId }, { _id: cartId }] }, (err, carts) => {
       console.log(userId + " " + cartId);
-      if (carts.length !== 0) {     
+      if (carts.length !== 0) {
         const cart = carts[0]
         const products = cart.products;
         const matchProduct = products.find(element => element.product.toString() === breakfastId);
@@ -351,7 +351,7 @@ exports.postAddItem = (req, res, next) => {
           }
           return total
         }
-        
+
         cart.totalPrice = totalPrice()
 
         // //setting user to the cartShop
@@ -428,18 +428,18 @@ exports.postAddItem = (req, res, next) => {
 //get cart with breakfasts
 exports.getCart = (req, res, next) => {
   try {
-    const userId = req.params.userId==="undefined"?undefined:req.params.userId;
-    const cartId = req.query.cartId==="undefined"?undefined:req.query.cartId;
+    const userId = req.params.userId === "undefined" ? undefined : req.params.userId;
+    const cartId = req.query.cartId === "undefined" ? undefined : req.query.cartId;
 
-    console.log(userId +" "+ cartId)
-    if(userId || cartId){
-      Cart.findOne({$or: [{user:userId}, {_id:cartId}]}).populate('products.product').exec((err, cart) => {
+    console.log(userId + " " + cartId)
+    if (userId || cartId) {
+      Cart.findOne({ $or: [{ user: userId }, { _id: cartId }] }).populate('products.product').exec((err, cart) => {
         if (err) {
           console.log(err)
           res.status(500).send(err)
         }
         else {
-          if(cart && cartId && userId && (cart.user===undefined) ){
+          if (cart && cartId && userId && (cart.user === undefined)) {
             cart.user = userId;
           }
           cart.save((err, cart) => {
@@ -452,18 +452,30 @@ exports.getCart = (req, res, next) => {
           })
         }
       })
-    }else{
-      Cart.findOne({undefined}).populate('products.product').exec((err, cart) => {
+    } else {
+      Cart.find({ user: { $exists: 0 } }).populate('products.product').exec((err, cart) => {
         if (err) {
           console.log(err)
           res.status(500).send(err)
-        }
-        else {
-          res.send({ success: true, cart })
+        } else {
+          if (cart.length!==0) {
+            res.send({ success: true, cart:cart[0] })
+          } else {
+            const cart = new Cart()
+            cart.save((err, cart) => {
+              if (err) {
+                console.log(err)
+                res.status(500).send(err)
+              } else {
+                res.send({ success: true, cart })
+              }
+            })
+          }
         }
       })
+
     }
-    
+
 
   } catch (err) {
     console.log(err)
