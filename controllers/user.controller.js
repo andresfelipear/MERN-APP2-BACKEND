@@ -354,10 +354,10 @@ exports.postAddItem = (req, res, next) => {
         
         cart.totalPrice = totalPrice()
 
-        //setting user to the cartShop
-        if(carts.length===1 && cartId && userId ){
-          cart.user = userId;
-        }
+        // //setting user to the cartShop
+        // if(carts.length===1 && cartId && userId ){
+        //   cart.user = userId;
+        // }
 
         cart.save((err, cart) => {
           if (err) {
@@ -429,16 +429,41 @@ exports.postAddItem = (req, res, next) => {
 exports.getCart = (req, res, next) => {
   try {
     const userId = req.params.userId==="undefined"?undefined:req.params.userId;
+    const cartId = req.query.cartId==="undefined"?undefined:req.query.cartId;
+
+    console.log(userId +" "+ cartId)
+    if(userId || cartId){
+      Cart.findOne({$or: [{user:userId}, {_id:cartId}]}).populate('products.product').exec((err, cart) => {
+        if (err) {
+          console.log(err)
+          res.status(500).send(err)
+        }
+        else {
+          if(cart && cartId && userId && (cart.user===undefined) ){
+            cart.user = userId;
+          }
+          cart.save((err, cart) => {
+            if (err) {
+              console.log(err)
+              res.status(500).send(err)
+            } else {
+              res.send({ success: true, cart })
+            }
+          })
+        }
+      })
+    }else{
+      Cart.findOne({undefined}).populate('products.product').exec((err, cart) => {
+        if (err) {
+          console.log(err)
+          res.status(500).send(err)
+        }
+        else {
+          res.send({ success: true, cart })
+        }
+      })
+    }
     
-    Cart.findOne({user:userId}).populate('products.product').exec((err, cart) => {
-      if (err) {
-        console.log(err)
-        res.status(500).send(err)
-      }
-      else {
-        res.send({ success: true, cart })
-      }
-    })
 
   } catch (err) {
     console.log(err)
