@@ -327,8 +327,7 @@ exports.postAddItem = (req, res, next) => {
 
     Cart.find({ $or: [{ user: userId }, { _id: cartId }] }, (err, carts) => {
       console.log(userId + " " + cartId);
-      if (carts.length !== 0) {
-        
+      if (carts.length !== 0) {     
         const cart = carts[0]
         const products = cart.products;
         const matchProduct = products.find(element => element.product.toString() === breakfastId);
@@ -356,7 +355,7 @@ exports.postAddItem = (req, res, next) => {
         cart.totalPrice = totalPrice()
 
         //setting user to the cartShop
-        if(cart.length==1 && cartId && userId ){
+        if(carts.length===1 && cartId && userId ){
           cart.user = userId;
         }
 
