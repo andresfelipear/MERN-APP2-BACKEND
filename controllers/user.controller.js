@@ -368,7 +368,6 @@ exports.postAddItem = (req, res, next) => {
 
         cart.save((err, cart) => {
           if (err) {
-            console.log("hola");
             console.log(err)
             res.status(500).send(err)
           } else {
@@ -376,7 +375,6 @@ exports.postAddItem = (req, res, next) => {
             cart.products = cart.products.filter(product => product.quantity !== 0);
             cart.save((err, cart) => {
               if (err) {
-                console.log("hola2");
                 console.log(err)
                 res.status(500).send(err)
               } else {
@@ -398,7 +396,6 @@ exports.postAddItem = (req, res, next) => {
           })
           cart.save((err, cart) => {
             if (err) {
-              console.log("hola3");
               console.log(err)
               res.status(500).send(err)
             } else {
@@ -441,20 +438,32 @@ exports.getCart = (req, res, next) => {
     console.log(userId + " " + cartId)
     if (userId || cartId) {
       Cart.find({ $or: [{ user: userId }, { _id: cartId }, { user: { $exists: 0 } }] }).populate('products.product').exec((err, carts) => {
-        if (err) {
-          console.log(err)
-          res.status(500).send(err)
-        }
-        else {
-          const cart = carts[0]
-          if (carts.length === 2) {
-            const cart2 = carts[1]
-            joinDuplicates(cart, cart2)
-            cart2.remove()
+        if(carts.length!==0){
+          if (err) {
+            console.log(err)
+            res.status(500).send(err)
           }
-          if (cart && cartId && userId && (cart.user === undefined)) {
-            cart.user = userId;
+          else {
+            const cart = carts[0]
+            if (carts.length === 2) {
+              const cart2 = carts[1]
+              joinDuplicates(cart, cart2)
+              cart2.remove()
+            }
+            if (cart && cartId && userId && (cart.user === undefined)) {
+              cart.user = userId;
+            }
+            cart.save((err, cart) => {
+              if (err) {
+                console.log(err)
+                res.status(500).send(err)
+              } else {
+                res.send({ success: true, cart })
+              }
+            })
           }
+        }else{
+          const cart = new Cart()
           cart.save((err, cart) => {
             if (err) {
               console.log(err)
@@ -464,6 +473,7 @@ exports.getCart = (req, res, next) => {
             }
           })
         }
+        
       })
     } else {
       Cart.find({ user: { $exists: 0 } }).populate('products.product').exec((err, cart) => {

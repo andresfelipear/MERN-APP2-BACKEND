@@ -1,6 +1,8 @@
 const Breakfasts = require("../models/breakfasts.models")
 const Address = require("../models/userAdress.model")
 const User = require("../models/user.model")
+const Cart = require("../models/cart.model")
+const sendEmail = require('../utils/email/sendEmail')
 
 const getById = (breakfastId) => {
     return Breakfasts.findById(breakfastId, (err, breakfast) => {
@@ -69,9 +71,9 @@ exports.postUserAddress = async (req, res, next) => {
 exports.postProcessOrder = async (req, res, next) => {
     const { token, cart, price } = req.body;
     const userId = req.user._id;
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("address");
     user.order.push({
-        cart: cart._id,
+        cart: cart,
         grandTotal: price,
         token: token
     })
@@ -80,21 +82,28 @@ exports.postProcessOrder = async (req, res, next) => {
             console.log(err)
             res.status(500).send(err)
         } else {
-            user.populate("address").execute((err, user)=>{
-                if (err) {
-                    console.log(err)
-                    res.status(500).send(err)
-                }else{
-                    const email = sendEmail(
-                        user.email,
-                        "Order Confirmation",
-                        { user: user, cart: cart, total:price, token:token, title: "Breakfasts App" },
-                        "./template/confirmationOrder.handlebars"
-                    )
-                    res.send({ success: true })
-                }
-            })
-            
+            if (err) {
+                console.log(err)
+                res.status(500).send(err)
+            } else {
+                const orderId = user.order[user.order.length - 1]._id
+                const email = sendEmail(
+                    user.email,
+                    "Order Confirmation",
+                    { username: user.username, city: user.address.city, address: `${user.address.addressField1}, ${user.address.addressField2}`, orderId: orderId, total: price.toFixed(2), token: token, title: "Breakfasts App" },
+                    "./template/confirmationOrder.handlebars"
+                )
+                Cart.findByIdAndDelete(cart._id, (err, response) => {
+                    if (err) {
+                        console.log(err)
+                        res.status(500).send(err)
+                    } else {
+                        res.send({ success: true })
+                    }
+                })
+
+            }
+
         }
     })
 

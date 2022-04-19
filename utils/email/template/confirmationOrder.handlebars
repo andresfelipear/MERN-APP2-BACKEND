@@ -29,10 +29,10 @@
 
 
             <div class="card-content" style="box-sizing: inherit;background-color: transparent;padding: 1.5rem; font-size: medium; text-align: justify;">
-                <p style="box-sizing: inherit;margin: 0;padding: 0; text-align: left; font-weight: bold; font-size: large;" >Order #{{cart._id}} </p>
+                <p style="box-sizing: inherit;margin: 0;padding: 0; text-align: left; font-weight: bold; font-size: large;" >Order #{{orderId}} </p>
                 <br><br>
                 <p class="has-text-info" style="box-sizing: inherit;margin: 0;padding: 0;color: #905960!important;">
-                    Hello {{user.username}}</p>
+                    Hello {{username}}</p>
                 
                 <p style="box-sizing: inherit;margin: 0;padding: 0;">Thanks for shopping with us. We'd like to let you
                     know that we have received your order and we are preparing it for shipment. Your order details are indicated below</p>
@@ -50,7 +50,7 @@
                                 <td>
                                     <p>
                                         <span>Your Order will be send to: </span><br>
-                                        <b>{{user.address.field1}} <br>{{user.address.city}}, British Columbia
+                                        <b>{{address}} <br>{{city}}, British Columbia
                                             <br>Canada</b>
                                     </p>
                                     <p>

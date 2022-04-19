@@ -27,9 +27,7 @@ const UserSchema = new Schema({
     },
     order:[{
         cart: { 
-            type: Schema.Types.ObjectId,
-            ref: 'Cart',
-
+            type: Object
         },
         token:{
             type:Object
