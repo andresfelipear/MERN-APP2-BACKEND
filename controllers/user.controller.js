@@ -103,7 +103,14 @@ exports.postRefreshToken = (req, res, next) => {
 //getData user logged
 exports.getData = (req, res, next) => {
   try {
-    res.send(req.user)
+    User.findById(req.user._id).populate('address').exec((err, user) => {
+      if (err) {
+        console.log(err)
+        res.status(500).send(err)
+      }else{
+        res.send(user)
+      }
+    })
 
   } catch (error) {
     console.log(err)
