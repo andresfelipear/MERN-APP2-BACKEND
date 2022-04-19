@@ -1,5 +1,6 @@
 const Breakfasts = require("../models/breakfasts.models")
 const Address = require("../models/userAdress.model")
+const User = require("../models/user.model")
 
 const getById = (breakfastId) => {
     return Breakfasts.findById(breakfastId, (err, breakfast) => {
@@ -27,33 +28,34 @@ exports.postLikeBreakfast = async (req, res, next) => {
 
 //save user address
 exports.postUserAddress = async (req, res, next) => {
-    const {fullname,phoneNumber,addressF1,addressF2,city,postalCode} = req.body
+    const { fullname, phoneNumber, addressF1, addressF2, city, postalCode } = req.body
+    const userId = req.user._id
     try {
-        console.log(req.user);
         const address = new Address({
-            user:req.user._id,
-            fullName:fullname,
-            phoneNumber:phoneNumber,
-            addressField1:addressF1,
-            addressField2:addressF2,
-            city:city,
-            postalCode:postalCode
+            user: req.user._id,
+            fullName: fullname,
+            phoneNumber: phoneNumber,
+            addressField1: addressF1,
+            addressField2: addressF2,
+            city: city,
+            postalCode: postalCode
         })
-        address.save((address,err)=>{
+        address.save(async (err, address) => {
             if (err) {
                 console.log(err)
                 res.status(500).send(err)
-              } else {
-                req.user.address = address._id
-                req.user.save((err, user)=>{
-                    if(err){
+            } else {
+                const user = await User.findById(userId)
+                user.address = address._id;
+                user.save((err, user) => {
+                    if (err) {
                         console.log(err)
                         res.status(500).send(err)
-                    }else{
-                        res.send({ success: true, address: address})
+                    } else {
+                        res.send({ success: true, address: address })
                     }
                 })
-              }
+            }
         })
 
     } catch (err) {
