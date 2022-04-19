@@ -1,5 +1,5 @@
 const passportLocalMongoose = require('passport-local-mongoose')
-const {Schema, model} = require("../db/connection") 
+const { Schema, model } = require("../db/connection")
 
 const Session = new Schema({
     refreshToken: {
@@ -9,24 +9,29 @@ const Session = new Schema({
 })
 
 const UserSchema = new Schema({
-    username: {type: String, unique: true, required: true},
-    email: {type: String, unique: true},
-    icon: {type: String},
-    password: {type: String},
+    username: { type: String, unique: true, required: true },
+    email: { type: String, unique: true },
+    icon: { type: String },
+    password: { type: String },
     authStrategy: {
-        type:String,
+        type: String,
         default: 'local'
     },
     refreshToken: {
         type: [Session]
     },
+    address: {
+        type: Schema.Types.ObjectId,
+        ref: 'Address',
+
+    }
 })
 
 
 
 //remove refreshtoken from the response
 UserSchema.set("toJSON", {
-    transform: function(doc, ret, options){
+    transform: function (doc, ret, options) {
         delete ret.refreshToken
         return ret
     }
