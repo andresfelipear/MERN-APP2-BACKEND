@@ -7,8 +7,11 @@ const {verifyUser} = require('../auth/authenticate')
 //like breakfast
 router.post('/like-breakfast',verifyUser, adminController.postLikeBreakfast)
 
-//like breakfast
+//save user address
 router.post('/userAddress',verifyUser, adminController.postUserAddress)
+
+//send order
+router.post('/process-order',verifyUser, adminController.postProcessOrder)
 
 module.exports = router
     

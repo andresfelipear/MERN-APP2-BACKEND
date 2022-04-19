@@ -64,3 +64,38 @@ exports.postUserAddress = async (req, res, next) => {
     }
 
 }
+
+//process order
+exports.postProcessOrder = async (req, res, next) => {
+    const { token, cart, price } = req.body;
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    user.order.push({
+        cart: cart._id,
+        grandTotal: price,
+        token: token
+    })
+    user.save((err, user) => {
+        if (err) {
+            console.log(err)
+            res.status(500).send(err)
+        } else {
+            user.populate("address").execute((err, user)=>{
+                if (err) {
+                    console.log(err)
+                    res.status(500).send(err)
+                }else{
+                    const email = sendEmail(
+                        user.email,
+                        "Order Confirmation",
+                        { user: user, cart: cart, total:price, token:token, title: "Breakfasts App" },
+                        "./template/confirmationOrder.handlebars"
+                    )
+                    res.send({ success: true })
+                }
+            })
+            
+        }
+    })
+
+}

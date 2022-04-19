@@ -33,6 +33,9 @@ const UserSchema = new Schema({
         },
         token:{
             type:Object
+        },
+        grandTotal:{
+            type:Number
         }
     }]
 })

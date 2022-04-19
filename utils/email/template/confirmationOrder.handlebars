@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en"
+    style="box-sizing: border-box;margin: 0;padding: 0;background-color: #fff;font-size: 16px;-moz-osx-font-smoothing: grayscale;-webkit-font-smoothing: antialiased;min-width: 300px;overflow-x: hidden;overflow-y: scroll;text-rendering: optimizeLegibility;-webkit-text-size-adjust: 100%;-moz-text-size-adjust: 100%;text-size-adjust: 100%;">
+
+<head style="box-sizing: inherit;">
+
+
+
+    <title style="box-sizing: inherit;">Confirmation Message</title>
+
+</head>
+
+<body
+    style="box-sizing: inherit;margin: 0;padding: 0;font-family: BlinkMacSystemFont,-apple-system,&quot;Segoe UI&quot;,Roboto,Oxygen,Ubuntu,Cantarell,&quot;Fira Sans&quot;,&quot;Droid Sans&quot;,&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif;color: #4a4a4a;font-size: 1em;font-weight: 400;line-height: 1.5;">
+    <div class="has-text-centered is-size-2 mx-6"
+        style="box-sizing: inherit;margin-left: 3rem!important;margin-right: 3rem!important;font-size: 2.5rem!important;text-align: center!important;">
+        <div class="card"
+            style="box-sizing: inherit;background-color: #fff;border-radius: .25rem;box-shadow: 0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02);color: #4a4a4a;max-width: 100%;position: relative;">
+            <div
+                style="background-color: #feecf0; display: flex; justify-content: center!important; align-items: center; ">
+                <div
+                    style="color:rgba(0,0,0,.7); font-weight: 600;padding: 1rem 1rem; font-style: italic; font-size: 3rem;">
+                    {{title}}
+                </div>
+                <div>
+                    <img style="width: 2rem; height:2rem;" src="cid:logo" alt="icon">
+                </div>
+            </div>
+
+
+            <div class="card-content" style="box-sizing: inherit;background-color: transparent;padding: 1.5rem; font-size: medium; text-align: justify;">
+                <p style="box-sizing: inherit;margin: 0;padding: 0; text-align: left; font-weight: bold; font-size: large;" >Order #{{cart._id}} </p>
+                <br><br>
+                <p class="has-text-info" style="box-sizing: inherit;margin: 0;padding: 0;color: #905960!important;">
+                    Hello {{user.username}}</p>
+                
+                <p style="box-sizing: inherit;margin: 0;padding: 0;">Thanks for shopping with us. We'd like to let you
+                    know that we have received your order and we are preparing it for shipment. Your order details are indicated below</p>
+                <div>
+                    <table style="width: 100%; align-items: baseline;">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <p>
+                                        <span>Your estimate delivery time is: </span><br>
+                                        <b>4 to 7 days since today.</b>
+                                    </p>
+
+                                </td>
+                                <td>
+                                    <p>
+                                        <span>Your Order will be send to: </span><br>
+                                        <b>{{user.address.field1}} <br>{{user.address.city}}, British Columbia
+                                            <br>Canada</b>
+                                    </p>
+                                    <p>
+                                        <strong>Order Total: ${{total}}</strong>
+                                    </p>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="is-size-4 mt-6 is-italic"
+                    style="box-sizing: inherit;margin: 0;padding: 0;margin-top: 3rem!important;font-size: 1.5rem!important;font-style: italic!important;">
+                    Please don’t reply to this email. We cannot receive or respond to replies to this email.</p>
+            </div>
+            <div class="card-footer has-background-info has-text-white p-3"
+                style="box-sizing: inherit;background-color: #feecf0!important;border-top: 1px solid #ededed;align-items: stretch;display: flex;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;color:rgba(0,0,0,.7)!important;padding: .75rem!important; justify-content:center!important;">
+                Share the happiness with the people that you love
+            </div>
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>
