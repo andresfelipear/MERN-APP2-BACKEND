@@ -30,36 +30,66 @@ exports.postLikeBreakfast = async (req, res, next) => {
 
 //save user address
 exports.postUserAddress = async (req, res, next) => {
-    const { fullname, phoneNumber, addressF1, addressF2, city, postalCode } = req.body
+    const { fullName, phoneNumber, addressField1, addressField2, city, postalCode } = req.body
     const userId = req.user._id
     try {
-        const address = new Address({
-            user: req.user._id,
-            fullName: fullname,
-            phoneNumber: phoneNumber,
-            addressField1: addressF1,
-            addressField2: addressF2,
-            city: city,
-            postalCode: postalCode
-        })
-        address.save(async (err, address) => {
-            if (err) {
-                console.log(err)
-                res.status(500).send(err)
-            } else {
-                const user = await User.findById(userId)
-                user.address = address._id;
-                user.save((err, user) => {
+        Address.findOne({ user: userId }, (err, address) => {
+            if (address) {
+                address.user = req.user._id;
+                address.fullName = fullName;
+                address.phoneNumber = phoneNumber;
+                address.addressField1 = addressField1;
+                address.addressField2 = addressField2;
+                address.city = city;
+                address.postalCode = postalCode;
+
+                address.save(async (err, address) => {
                     if (err) {
                         console.log(err)
                         res.status(500).send(err)
                     } else {
-                        res.send({ success: true, address: address })
+                        const user = await User.findById(userId)
+                        user.address = address._id;
+                        user.save((err, user) => {
+                            if (err) {
+                                console.log(err)
+                                res.status(500).send(err)
+                            } else {
+                                res.send({ success: true, address: address })
+                            }
+                        })
+                    }
+                })
+            } else {
+                const address = new Address({
+                    user: req.user._id,
+                    fullName: fullName,
+                    phoneNumber: phoneNumber,
+                    addressField1: addressField1,
+                    addressField2: addressField2,
+                    city: city,
+                    postalCode: postalCode
+                })
+
+                address.save(async (err, address) => {
+                    if (err) {
+                        console.log(err)
+                        res.status(500).send(err)
+                    } else {
+                        const user = await User.findById(userId)
+                        user.address = address._id;
+                        user.save((err, user) => {
+                            if (err) {
+                                console.log(err)
+                                res.status(500).send(err)
+                            } else {
+                                res.send({ success: true, address: address })
+                            }
+                        })
                     }
                 })
             }
         })
-
     } catch (err) {
         console.log(err)
         res.status(400).json({ err })
