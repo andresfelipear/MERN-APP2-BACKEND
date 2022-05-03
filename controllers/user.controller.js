@@ -15,6 +15,7 @@ const clientURL = process.env.CLIENT_URL
 //date time format
 const date = require('date-and-time')
 const { copyFileSync } = require('fs')
+const { db } = require('../models/cart.model')
 
 const getById = (cartId) => {
   return Cart.findById(cartId, (err, cart) => {
@@ -289,12 +290,13 @@ exports.postContact = async (req, res, next) => {
 }
 
 //get Breakfasts(all)
-exports.getBreakfasts = (req, res, next) => {
+exports.getBreakfasts = async(req, res, next) => {
   try {
     Breakfasts.find((err, breakfasts) => {
       if (err) {
         res.status(400).json({ err });
       } else {
+        console.log("hola")
         res.send({ success: true, breakfasts })
       }
     })
@@ -360,11 +362,6 @@ exports.postAddItem = (req, res, next) => {
         }
 
         cart.totalPrice = totalPrice()
-
-        // //setting user to the cartShop
-        // if(carts.length===1 && cartId && userId ){
-        //   cart.user = userId;
-        // }
 
         cart.save((err, cart) => {
           if (err) {
