@@ -41,3 +41,5 @@ app.use("/api/admin", adminRoute)
 
 const {PORT = 8000} = process.env
 app.listen(PORT, () => log.green("SERVER STATUS", `Listening on port ${PORT}`))
+
+module.exports = app
